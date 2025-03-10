@@ -3745,6 +3745,26 @@ class ImageDict(TypedDict, total=False):
 ImageOrDict = Union[Image, ImageDict]
 
 
+class SafetyAttributes(_common.BaseModel):
+  """Safety attributes of a GeneratedImage or the user-provided prompt."""
+
+  categories: Optional[list[str]] = Field(default=None, description="""""")
+  scores: Optional[list[float]] = Field(default=None, description="""""")
+
+
+class SafetyAttributesDict(TypedDict, total=False):
+  """Safety attributes of a GeneratedImage or the user-provided prompt."""
+
+  categories: Optional[list[str]]
+  """"""
+
+  scores: Optional[list[float]]
+  """"""
+
+
+SafetyAttributesOrDict = Union[SafetyAttributes, SafetyAttributesDict]
+
+
 class GeneratedImage(_common.BaseModel):
   """An output image."""
 
@@ -3758,6 +3778,9 @@ class GeneratedImage(_common.BaseModel):
       description="""Responsible AI filter reason if the image is filtered out of the
       response.
       """,
+  )
+  safety_attributes: Optional[SafetyAttributes] = Field(
+      default=None, description=""""""
   )
   enhanced_prompt: Optional[str] = Field(
       default=None,
@@ -3778,6 +3801,9 @@ class GeneratedImageDict(TypedDict, total=False):
   """Responsible AI filter reason if the image is filtered out of the
       response.
       """
+
+  safety_attributes: Optional[SafetyAttributesDict]
+  """"""
 
   enhanced_prompt: Optional[str]
   """The rewritten prompt used for the image generation if the prompt
