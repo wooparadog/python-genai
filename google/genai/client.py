@@ -77,6 +77,7 @@ class AsyncClient:
   def operations(self) -> AsyncOperations:
     return self._operations
 
+
 class DebugConfig(pydantic.BaseModel):
   """Configuration options that change client network behavior when testing."""
 
@@ -88,8 +89,8 @@ class DebugConfig(pydantic.BaseModel):
       default_factory=lambda: os.getenv('GOOGLE_GENAI_REPLAYS_DIRECTORY', None)
   )
 
-  replay_id: Optional[str] = pydantic.Field(
-      default_factory=lambda: os.getenv('GOOGLE_GENAI_REPLAY_ID', None)
+  replay_id: str = pydantic.Field(
+      default_factory=lambda: os.getenv('GOOGLE_GENAI_REPLAY_ID', '')
   )
 
 
@@ -155,7 +156,7 @@ class Client:
   def __init__(
       self,
       *,
-      vertexai: Optional[bool] = None,
+      vertexai: bool = False,
       api_key: Optional[str] = None,
       credentials: Optional[google.auth.credentials.Credentials] = None,
       project: Optional[str] = None,
@@ -193,6 +194,8 @@ class Client:
     """
 
     self._debug_config = debug_config or DebugConfig()
+    if isinstance(http_options, dict):
+      http_options = HttpOptions(**http_options)
 
     self._api_client = self._get_api_client(
         vertexai=vertexai,
@@ -214,7 +217,7 @@ class Client:
 
   @staticmethod
   def _get_api_client(
-      vertexai: Optional[bool] = None,
+      vertexai: bool = False,
       api_key: Optional[str] = None,
       credentials: Optional[google.auth.credentials.Credentials] = None,
       project: Optional[str] = None,
@@ -228,7 +231,7 @@ class Client:
         'auto',
     ]:
       return ReplayApiClient(
-          mode=debug_config.client_mode,
+          mode=debug_config.client_mode,  # type: ignore[arg-type]
           replay_id=debug_config.replay_id,
           replays_directory=debug_config.replays_directory,
           vertexai=vertexai,

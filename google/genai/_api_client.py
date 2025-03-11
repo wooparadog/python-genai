@@ -240,7 +240,7 @@ class BaseApiClient:
 
   def __init__(
       self,
-      vertexai: Optional[bool] = None,
+      vertexai: bool = False,
       api_key: Optional[str] = None,
       credentials: Optional[google.auth.credentials.Credentials] = None,
       project: Optional[str] = None,
@@ -248,7 +248,7 @@ class BaseApiClient:
       http_options: Optional[HttpOptionsOrDict] = None,
   ):
     self.vertexai = vertexai
-    if self.vertexai is None:
+    if self.vertexai is False:
       if os.environ.get('GOOGLE_GENAI_USE_VERTEXAI', '0').lower() in [
           'true',
           '1',
@@ -633,7 +633,7 @@ class BaseApiClient:
 
   def upload_file(
       self, file_path: Union[str, io.IOBase], upload_url: str, upload_size: int
-  ) -> dict[str, str]:
+  ) -> HttpResponse:
     """Transfers a file to the given URL.
 
     Args:
@@ -648,10 +648,18 @@ class BaseApiClient:
           The response json object from the finalize request.
     """
     if isinstance(file_path, io.IOBase):
-      return self._upload_fd(file_path, upload_url, upload_size)
+      upload_fd_response = self._upload_fd(file_path, upload_url, upload_size)
+      return HttpResponse(
+          upload_fd_response.get('headers'),
+          json.dumps(upload_fd_response),
+      )
     else:
       with open(file_path, 'rb') as file:
-        return self._upload_fd(file, upload_url, upload_size)
+        upload_fd_response = self._upload_fd(file, upload_url, upload_size)
+        return HttpResponse(
+            upload_fd_response.get('headers'),
+            json.dumps(upload_fd_response),
+        )
 
   def _upload_fd(
       self, file: io.IOBase, upload_url: str, upload_size: int
@@ -750,7 +758,7 @@ class BaseApiClient:
       file_path: Union[str, io.IOBase],
       upload_url: str,
       upload_size: int,
-  ) -> dict[str, str]:
+  ) -> HttpResponse:
     """Transfers a file asynchronously to the given URL.
 
     Args:
@@ -776,7 +784,7 @@ class BaseApiClient:
       file: Union[io.IOBase, anyio.AsyncFile],
       upload_url: str,
       upload_size: int,
-  ) -> dict[str, str]:
+  ) -> HttpResponse:
     """Transfers a file asynchronously to the given URL.
 
     Args:
@@ -826,7 +834,9 @@ class BaseApiClient:
         raise ValueError(
             'Failed to upload file: Upload status is not finalized.'
         )
-      return response.json()
+      return HttpResponse(
+          response.headers, json.dumps(response.json())
+      )
 
   async def async_download_file(self, path: str, http_options):
     """Downloads the file data.
