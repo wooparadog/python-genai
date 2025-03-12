@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.5.1](https://github.com/googleapis/python-genai/compare/v1.5.0...v1.5.1) (2025-03-12)
+
+
+### Bug Fixes
+
+* Fix the missing learning_rate_multiplier in CreateTuningJobConfig conversion. ([0bd0a5e](https://github.com/googleapis/python-genai/commit/0bd0a5ec959a8991e22269bf4fb2b4b0220d47c4))
+* Fix video.show() to display video ([dab1a4f](https://github.com/googleapis/python-genai/commit/dab1a4f474aed15e8d544162aa249e66f173d3e4))
+* Remove unsupported parameter negative_prompt from Gemini API generate_images ([5f3333e](https://github.com/googleapis/python-genai/commit/5f3333e8960ef5b0593d535e6c9f887e9a027d5c))
+
+
+### Documentation
+
+* Add docstring: the sha256_hash is encoded in base64. ([d710627](https://github.com/googleapis/python-genai/commit/d710627c24009809cd3ae105b7dd4f340cdff377))
+* Update docs with agreed-upon fixes ([f523a7c](https://github.com/googleapis/python-genai/commit/f523a7c45abc8373c01cfcb737fd446d8567fc46))
+
 ## [1.5.0](https://github.com/googleapis/python-genai/compare/v1.4.0...v1.5.0) (2025-03-07)
 
 
